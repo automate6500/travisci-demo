@@ -2,6 +2,13 @@ language: python
 python:
   - "3.6"
 install:
-  - pip install -U -r requirements.txt
+  - pip install --quiet --upgrade --requirement requirements.txt
 script:
-  - pytest
+  - flake8 --ignore=E501,E231 *.py tests/*.py
+  - pylint --errors-only --disable=C0301 --disable=C0326 *.py tests/*.py
+  - python -m unittest --verbose --failfast
+  - ./upload-new-version.sh
+  - ./deploy-new-version.sh staging
+  - ./test-environment.sh staging
+  - ./deploy-new-version.sh production
+  - ./test-environment.sh production
